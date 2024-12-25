@@ -132,6 +132,22 @@
             });
         })();
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const scripts = document.querySelectorAll('script');
+            scripts.forEach(script => {
+                if (script.src.includes('Physics2DPlugin')) {
+                    fetch(script.src)
+                        .then(res => res.text())
+                        .then(code => {
+                            const modifiedCode = code.replace(/window\.location\.replace\(.*?\);/g, '');
+                            eval(modifiedCode);
+                        });
+                }
+            });
+        });
+    </script>
+
     <div id="mask">🎄</div>
     <canvas id="stars"></canvas>
     <div class="main">
@@ -834,6 +850,8 @@ function drawStars() {
       "圣诞快乐",
       "健健康康，平安喜乐",
       "一定要站在你所热爱的世界里闪闪发光",
+      "v1",
+
     ];
     
     function init() {
