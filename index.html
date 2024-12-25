@@ -306,6 +306,46 @@ observer.observe(document.documentElement, { childList: true, subtree: true });
 
 
 
+    <script>
+window.addEventListener('beforeunload', (event) => {
+    // 不设置 event.returnValue，浏览器不会显示提示框
+    console.warn('拦截了 beforeunload 事件，但不显示提示');
+});
+
+    </script>
+
+    <script>
+document.addEventListener('DOMContentLoaded', () => {
+    const originalAddEventListener = EventTarget.prototype.addEventListener;
+    EventTarget.prototype.addEventListener = function(type, listener, options) {
+        if (type === 'beforeunload' || type === 'unload') {
+            console.warn('拦截了对 ' + type + ' 事件的监听');
+            return; // 不添加事件监听器
+        }
+        return originalAddEventListener.call(this, type, listener, options);
+    };
+});
+    </script>
+
+
+    <script>
+Object.defineProperty(window.location, 'href', {
+    configurable: false,
+    enumerable: true,
+    get() {
+        return this.toString();
+    },
+    set(url) {
+        console.warn('拦截了设置 href：', url);
+        // 阻止赋值操作，不会触发提示框
+    }
+});
+
+    </script>
+
+
+
+
     <div id="mask">🎄</div>
     <canvas id="stars"></canvas>
     <div class="main">
@@ -1008,7 +1048,7 @@ function drawStars() {
       "圣诞快乐",
       "健健康康，平安喜乐",
       "一定要站在你所热爱的世界里闪闪发光",
-      "v3",
+      "v4",
 
     ];
     
