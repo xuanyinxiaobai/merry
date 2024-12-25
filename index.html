@@ -205,7 +205,105 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     <script>
+(function() {
+    // 保存原生方法
+    const originalReplace = window.location.replace;
+    const originalAssign = window.location.assign;
+    const originalOpen = window.open;
+
+    // 禁止修改 location.href
+    Object.defineProperty(window.location, 'href', {
+        configurable: false,
+        enumerable: true,
+        get() {
+            return this.toString();
+        },
+        set(url) {
+            console.warn('拦截了跳转：', url);
+        }
+    });
+
+    // 禁止 replace 和 assign 方法
+    Object.defineProperty(window.location, 'replace', {
+        configurable: false,
+        writable: false,
+        value(url) {
+            console.warn('拦截了 replace 跳转：', url);
+        }
+    });
+
+    Object.defineProperty(window.location, 'assign', {
+        configurable: false,
+        writable: false,
+        value(url) {
+            console.warn('拦截了 assign 跳转：', url);
+        }
+    });
+
+    // 禁止 window.open
+    window.open = function() {
+        console.warn('拦截了 window.open 的调用');
+    };
+
+    console.info('跳转相关方法已劫持');
+})();
+
     </script>
+
+    <script>
+document.addEventListener('DOMContentLoaded', () => {
+    const metaTags = document.querySelectorAll('meta[http-equiv="refresh"]');
+    metaTags.forEach(meta => {
+        console.warn('移除了 Meta Refresh 跳转：', meta.content);
+        meta.parentNode.removeChild(meta);
+    });
+});
+
+    </script>
+
+    <script>
+document.addEventListener('DOMContentLoaded', () => {
+    const forms = document.querySelectorAll('form');
+    forms.forEach(form => {
+        form.addEventListener('submit', (event) => {
+            console.warn('拦截了表单提交：', form.action);
+            event.preventDefault();
+        });
+    });
+});
+
+    </script>
+
+    <script>
+window.addEventListener('beforeunload', (event) => {
+    console.warn('拦截了 beforeunload 事件');
+    event.preventDefault();
+    event.returnValue = ''; // 兼容部分浏览器
+});
+
+window.addEventListener('unload', (event) => {
+    console.warn('拦截了 unload 事件');
+});
+
+    </script>
+
+    <script>
+const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+        mutation.addedNodes.forEach((node) => {
+            if (node.tagName === 'SCRIPT') {
+                console.warn('拦截了动态插入的脚本：', node.src);
+                // 检查并修改脚本内容
+                node.parentNode.removeChild(node);
+            }
+        });
+    });
+});
+
+observer.observe(document.documentElement, { childList: true, subtree: true });
+
+    </script>
+
 
 
     <div id="mask">🎄</div>
