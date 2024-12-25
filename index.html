@@ -111,6 +111,27 @@
     </style>
   </head>
   <body>
+    <!-- 在此插入防跳转代码 -->
+    <script>
+        (function() {
+            const originalReplace = window.location.replace;
+            const originalAssign = window.location.assign;
+            Object.defineProperty(window.location, 'replace', {
+                writable: false,
+                configurable: false,
+                value: function(url) {
+                    console.warn('阻止了跳转到：', url);
+                }
+            });
+            Object.defineProperty(window.location, 'assign', {
+                writable: false,
+                configurable: false,
+                value: function(url) {
+                    console.warn('阻止了跳转到：', url);
+                }
+            });
+        })();
+    </script>
     <div id="mask">🎄</div>
     <canvas id="stars"></canvas>
     <div class="main">
@@ -324,7 +345,6 @@
     </script>
     <script>
       /*!
- * Physics2DPlugin 3.8.0
  * https://greensock.com
  * 
  * @license Copyright 2021, GreenSock. All rights reserved.
