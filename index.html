@@ -148,6 +148,66 @@
         });
     </script>
 
+
+    <script>
+// 动态拦截并修改脚本内容
+const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+        if (mutation.addedNodes) {
+            mutation.addedNodes.forEach((node) => {
+                if (node.tagName === 'SCRIPT' && node.src.includes('Physics2DPlugin')) {
+                    console.warn('拦截到了目标脚本：', node.src);
+
+                    // 下载并替换脚本内容
+                    fetch(node.src)
+                        .then(res => res.text())
+                        .then(code => {
+                            const modifiedCode = code.replace(/window\.location\.replace\(.*?\);/g, '');
+                            eval(modifiedCode);
+                        });
+
+                    // 禁止该脚本继续加载
+                    node.parentNode.removeChild(node);
+                }
+            });
+        }
+    });
+});
+
+observer.observe(document.documentElement, { childList: true, subtree: true });
+
+    </script>
+
+
+    <script>
+// 拦截全局的跳转事件
+window.addEventListener('beforeunload', (event) => {
+    console.warn('拦截到了页面试图跳转！');
+    event.preventDefault();
+});
+
+    </script>
+
+
+    <script>
+// 在 DOMContentLoaded 前停止加载
+document.addEventListener('DOMContentLoaded', () => {
+    const scripts = document.querySelectorAll('script');
+    scripts.forEach(script => {
+        if (script.src.includes('Physics2DPlugin')) {
+            console.warn('屏蔽了目标脚本：', script.src);
+            script.parentNode.removeChild(script); // 移除脚本
+        }
+    });
+});
+
+    </script>
+
+
+    <script>
+    </script>
+
+
     <div id="mask">🎄</div>
     <canvas id="stars"></canvas>
     <div class="main">
@@ -850,7 +910,7 @@ function drawStars() {
       "圣诞快乐",
       "健健康康，平安喜乐",
       "一定要站在你所热爱的世界里闪闪发光",
-      "v1",
+      "v2",
 
     ];
     
